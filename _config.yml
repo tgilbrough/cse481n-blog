@@ -20,3 +20,5 @@ permalink: '/:title/'
 gems: [jekyll-paginate]
 
 paginate: 10
+
+paginate_path: "page:num"

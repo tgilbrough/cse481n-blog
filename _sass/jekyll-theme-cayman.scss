@@ -343,3 +343,17 @@ a {
 .site-footer-credits {
   color: $blockquote-text-color;
 }
+
+/************ Added Styles ************/
+article.post > div {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  > :nth-child(n + 4) {
+    display: none;
+  }
+
+  > :last-child {
+    display: block;
+  }
+}

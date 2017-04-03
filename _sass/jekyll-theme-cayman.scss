@@ -348,6 +348,7 @@ a {
 article.post > div {
   text-overflow: ellipsis;
   white-space: nowrap;
+  overflow: hidden;
 
   > :nth-child(n + 4) {
     display: none;

@@ -6,7 +6,7 @@
 # 'jekyll serve'. If you change this file, please restart the server process.
 
 # Site settings
-title: CSE481N
+title: MrKnowItAll
 description: 'Natural Language Processing Capstone - Spring 2017 - University of Washington'
 baseurl: '/cse481n-blog' # the subpath of your site, e.g. /blog
 #url: '' # the base hostname & protocol for your site http://www.example.com
@@ -17,8 +17,10 @@ markdown: kramdown
 
 permalink: '/:title/'
 
-gems: [jekyll-paginate]
+gems: [jekyll-paginate, 'jekyll-github-metadata']
 
 paginate: 10
 
 paginate_path: "blog/page:num"
+
+repository: tgilbrough/mrknowitall

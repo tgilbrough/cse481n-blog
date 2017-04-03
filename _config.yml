@@ -7,7 +7,7 @@
 
 # Site settings
 title: CSE481N
-description: '' # write a nice description for your blog
+description: 'Natural Language Processing Capstone - Spring 2017 - University of Washington'
 baseurl: '' # the subpath of your site, e.g. /blog
 url: '' # the base hostname & protocol for your site http://www.example.com
 # google_analytics: 'UA-XXXXXX-X'

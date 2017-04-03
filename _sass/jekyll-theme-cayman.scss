@@ -346,9 +346,12 @@ a {
 
 /************ Added Styles ************/
 article.post > div {
-  text-overflow: ellipsis;
   white-space: nowrap;
-  overflow: hidden;
+
+  > p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
 
   > :nth-child(n + 4) {
     display: none;

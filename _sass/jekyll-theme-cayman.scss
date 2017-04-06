@@ -345,6 +345,10 @@ a {
 }
 
 /************ Added Styles ************/
+.blog-posts > hr:last-of-type {
+  display: none;
+}
+
 
 #disqus_thread {
   margin-top: 75px;

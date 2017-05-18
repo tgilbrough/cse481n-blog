@@ -1,15 +1,17 @@
 'use strict';
 
 
-function getPassages(query_id, callback) {
-    d3.json('data/passages/' + query_id + '.json', callback);
+function getAnswer(query_id, callback) {
+    d3.json('data/answers/' + query_id + '.json', callback);
 }
 
 function createPassageView() {
     var selection = d3.select('#passages');
 
     return function(query) {
-        getPassages(query.query_id, function(passages) {
+        getAnswer(query.query_id, function(answer) {
+            var passages = answer.passages;
+
             selection.selectAll('*').remove();
 
             var passageSelection = selection.selectAll('div.passage')
@@ -24,17 +26,32 @@ function createPassageView() {
                 .text(function(passage) { return passage.url; });
 
             passageSelection.append('p')
-                .attr('class', 'passage-text')
-                .text(function(passage) { return passage.passage_text; });
+                .selectAll('span')
+                .data(function(passage) {
+                    var logitScale = d3.scaleQuantize()
+                        .domain(d3.extent(passage.logits))
+                        .range(d3.schemeGreens[9].slice(0, 5));
+
+                    return passage.tokens.map(function(token, index) {
+                        var logit = passage.logits[index];
+                        var color = d3.color(logitScale(logit));
+
+                        return {
+                            token: token,
+                            logit: logit,
+                            color: color.toString()
+                        };
+                    });
+                })
+                .enter()
+                .append('span')
+                .attr('class', 'token')
+                .attr('logit', function(token) { return token.logit; })
+                .style('background-color', function(token) { return token.color; })
+                .text(function(token) { return token.token; });
+
         });
     };
-}
-
-function onSearch(query) {
-    console.log(query);
-    getPassages(query.query_id, function(passages) {
-        console.log(passages);
-    });
 }
 
 function autocomplete(queries) {

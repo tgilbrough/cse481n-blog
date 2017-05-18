@@ -10,16 +10,22 @@ function createPassageView() {
 
     return function(query) {
         getPassages(query.query_id, function(passages) {
+            selection.selectAll('*').remove();
+
             var passageSelection = selection.selectAll('div.passage')
-                .data(passages);
-
-            passageSelection.enter()
+                .data(passages)
+                .enter()
                 .append('div')
-                .attr('class', 'passage')
-                .merge(passageSelection)
-                .text(function(passage) { return passage.passage_text; });
+                .attr('class', 'passage');
 
-            passageSelection.exit().remove();
+            passageSelection.append('a')
+                .attr('class', 'passage-link')
+                .attr('href', function(passage) { return passage.url; })
+                .text(function(passage) { return passage.url; });
+
+            passageSelection.append('p')
+                .attr('class', 'passage-text')
+                .text(function(passage) { return passage.passage_text; });
         });
     };
 }
@@ -45,6 +51,8 @@ function autocomplete(queries) {
     });
 
     var searchBox = $('input#search');
+
+    searchBox.focus();
 
     function updateSearchBoxValue(event, ui) {
         event.preventDefault();

@@ -32,16 +32,34 @@ function createPassageView() {
                 return index === 0;
             });
 
-        passageSelection.append('div')
-            .attr('class', 'rank')
-            .text(function(passage, index) { return index + 1; });
+        var rankContainer = passageSelection.append('div')
+            .attr('class', 'rank-container');
 
-        passageSelection.append('a')
+        rankContainer.append('div')
+            .attr('class', 'rank-number')
+            .text(function(passage, index) {
+                return '#' + (index + 1);
+            });
+
+        rankContainer.append('p')
+            .attr('class', 'relevance')
+            .text('Relevance');
+
+        rankContainer.append('p')
+            .text(function(passage) {
+                return passage.relevance.toFixed(3);
+            });
+
+        var passageContainer = passageSelection.append('div')
+            .attr('class', 'passage-container');
+
+        passageContainer.append('a')
             .attr('class', 'passage-link')
             .attr('href', function(passage) { return passage.url; })
             .text(function(passage) { return passage.url; });
 
-        passageSelection.append('p')
+        passageContainer.append('p')
+            .attr('class', 'passage-text')
             .selectAll('span')
             .data(function(passage) {
                 var logitScale = d3.scaleQuantize()

@@ -29,7 +29,7 @@ function createPassageView() {
             .append('div')
             .attr('class', 'passage')
             .classed('selected', function(passage, index) {
-                return index === 0;
+                return index === answer.passage_index;
             });
 
         var rankContainer = passageSelection.append('div')
@@ -63,11 +63,11 @@ function createPassageView() {
             .selectAll('span')
             .data(function(passage) {
                 var logitScale = d3.scaleQuantize()
-                    .domain(d3.extent(passage.logits))
+                    .domain(d3.extent(passage.logits_start))
                     .range(d3.schemeGreens[9].slice(0, 5));
 
                 return passage.tokens.map(function(token, index) {
-                    var logit = passage.logits[index];
+                    var logit = passage.logits_start[index];
                     var color = d3.color(logitScale(logit));
 
                     return {
@@ -81,6 +81,7 @@ function createPassageView() {
             .append('span')
             .attr('class', 'token')
             .attr('logit', function(token) { return token.logit; })
+            .attr('index', function(token, index) { return index; })
             .style('background-color', function(token) { return token.color; })
             .text(function(token) { return token.token; });
     };
@@ -122,6 +123,8 @@ function autocomplete(queries) {
             };
 
             getAnswer(query.query_id, function(answer) {
+                console.log(query);
+                console.log(answer);
                 updatePassageView(query, answer);
                 updateAnswerView(query, answer);
             });

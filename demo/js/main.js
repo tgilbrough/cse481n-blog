@@ -9,10 +9,23 @@ function createAnswerView() {
     var selection = d3.select('p#answer');
 
     return function(query, answer) {
-        var all_tokens = answer.passages[answer.passage_index].tokens;
-        var tokens = all_tokens.slice(answer.start_index, answer.end_index);
-        selection.text(tokens.join(' '));
+        var answerText = answer.passages
+            .find(function(passage) { return passage.selected; })
+            .tokens.slice(answer.start_index, answer.end_index)
+            .join(' ');
+
+        selection.text(answerText);
     }
+}
+
+function cumSum(array) {
+    var sum = [];
+
+    array.reduce(function(a, b, i) {
+        return sum[i] = a + b; 
+    }, 0);
+
+    return sum;
 }
 
 function createPassageView() {
@@ -28,9 +41,7 @@ function createPassageView() {
             .enter()
             .append('div')
             .attr('class', 'passage')
-            .classed('selected', function(passage, index) {
-                return index === answer.passage_index;
-            });
+            .classed('selected', function(passage) { return passage.selected; });
 
         var rankContainer = passageSelection.append('div')
             .attr('class', 'rank-container');
@@ -62,25 +73,30 @@ function createPassageView() {
             .attr('class', 'passage-text')
             .selectAll('span')
             .data(function(passage) {
-                var logitScale = d3.scaleQuantize()
-                    .domain(d3.extent(passage.logits_start))
+                var pStart = cumSum(passage.logits_start);
+                var pEnd = cumSum(passage.logits_end);
+                var pIn = pStart.map(function(p, i) {
+                    return p * (1 - pEnd[i]);
+                });
+
+                var colorScale = d3.scaleQuantize()
+                    .domain(d3.extent(pIn))
                     .range(d3.schemeGreens[9].slice(0, 5));
 
                 return passage.tokens.map(function(token, index) {
-                    var logit = passage.logits_start[index];
-                    var color = d3.color(logitScale(logit));
-
                     return {
                         token: token,
-                        logit: logit,
-                        color: color.toString()
+                        logitStart: passage.logits_start[index],
+                        logitEnd: passage.logits_end[index],
+                        color: colorScale(pIn[index])
                     };
                 });
             })
             .enter()
             .append('span')
             .attr('class', 'token')
-            .attr('logit', function(token) { return token.logit; })
+            .attr('logit-start', function(token) { return token.logitStart; })
+            .attr('logit-end', function(token) { return token.logitEnd; })
             .attr('index', function(token, index) { return index; })
             .style('background-color', function(token) { return token.color; })
             .text(function(token) { return token.token; });

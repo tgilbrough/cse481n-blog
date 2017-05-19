@@ -61,12 +61,6 @@ input#search, button#lucky {
     text-align: center;
 }
 
-.rank-number {
-    font-weight: bold;
-    font-size: 2em;
-    margin-bottom: 0.5em;
-}
-
 .button-container {
     margin-top: 0.5em;
 }

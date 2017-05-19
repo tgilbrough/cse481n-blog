@@ -45,6 +45,14 @@ function createPassageView() {
     return function(query, answer) {
         var passages = answer.passages;
 
+        function sortKey(passage) {
+            return passage.relevance + passage.selected ? 1 : 0;
+        }
+
+        passages.sort(function(x, y) {
+            return d3.descending(sortKey(x), sortKey(y));
+        });
+
         selection.selectAll('*').remove();
 
         var passageSelection = selection.selectAll('div.passage')
@@ -56,12 +64,6 @@ function createPassageView() {
 
         var rankContainer = passageSelection.append('div')
             .attr('class', 'rank-container');
-
-        rankContainer.append('div')
-            .attr('class', 'rank-number')
-            .text(function(passage, index) {
-                return '#' + (index + 1);
-            });
 
         rankContainer.append('p')
             .attr('class', 'relevance')

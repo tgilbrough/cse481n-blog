@@ -35,6 +35,10 @@ function cumSum(array) {
     return sum;
 }
 
+function sample(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
 function createPassageView() {
     var selection = d3.select('div#passages');
 
@@ -130,7 +134,23 @@ function autocomplete(queries) {
 
     function updateSearchBoxValue(event, ui) {
         event.preventDefault();
-        searchBox.val(ui.item.label);
+
+        if (ui.item) {
+            searchBox.val(ui.item.label);
+        }
+    }
+
+    function selectQuestion(autocompleteQuery) {
+        var query = {
+            query: autocompleteQuery.label,
+            query_id: autocompleteQuery.value - 1,
+            query_type: autocompleteQuery.type
+        };
+
+        getAnswer(query.query_id, function(answer) {
+            updatePassageView(query, answer);
+            updateAnswerView(query, answer);
+        });
     }
 
     searchBox.autocomplete({
@@ -139,23 +159,17 @@ function autocomplete(queries) {
             response($.ui.autocomplete.filter(queries, request.term).slice(0, MAX_RESULTS));
         },
         select: function(event, ui) {
-            var query = {
-                query: ui.item.label,
-                query_id: ui.item.value - 1,
-                query_type: ui.item.type
-            };
-
-            getAnswer(query.query_id, function(answer) {
-                console.log(query);
-                console.log(answer);
-                updatePassageView(query, answer);
-                updateAnswerView(query, answer);
-            });
-
+            selectQuestion(ui.item);
             updateSearchBoxValue(event, ui);
         },
         change: updateSearchBoxValue,
         focus: updateSearchBoxValue
+    });
+
+    d3.select('button#lucky').on('click', function() {
+        var query = sample(queries);
+        searchBox.val(query.label);
+        selectQuestion(query);
     });
 }
 

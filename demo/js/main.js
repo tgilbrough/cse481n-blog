@@ -12,11 +12,16 @@ function createAnswerView() {
         var passage = answer.passages
             .find(function(passage) { return passage.selected; });
 
-        var answerText = passage.tokens
-            .slice(passage.start_index, passage.end_index)
-            .join(' ');
+        if (passage) {
+            var answerText = passage.tokens
+                .slice(passage.start_index, passage.end_index)
+                .join(' ');
 
-        selection.text(answerText);
+            selection.text(answerText);
+        } else {
+            console.error('no answer found', query, answer);
+            selection.text('');
+        }
     }
 }
 

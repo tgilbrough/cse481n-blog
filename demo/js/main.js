@@ -80,37 +80,71 @@ function createPassageView() {
             .attr('href', function(passage) { return passage.url; })
             .text(function(passage) { return passage.url; });
 
-        passageContainer.append('p')
+        var tokens = passageContainer.append('p')
             .attr('class', 'passage-text')
             .selectAll('span')
             .data(function(passage) {
+                function makeScale(values) {
+                    return d3.scaleQuantize()
+                        .domain(d3.extent(values))
+                        .range(d3.schemeGreens[9].slice(0, 5));
+                }
+
                 var pStart = cumSum(passage.logits_start);
                 var pEnd = cumSum(passage.logits_end);
                 var pIn = pStart.map(function(p, i) {
                     return p * (1 - pEnd[i]);
                 });
 
-                var colorScale = d3.scaleQuantize()
-                    .domain(d3.extent(pIn))
-                    .range(d3.schemeGreens[9].slice(0, 5));
+                var startColorScale = makeScale(passage.logits_start),
+                    endColorScale = makeScale(passage.logits_end),
+                    inColorScale = makeScale(pIn);
 
                 return passage.tokens.map(function(token, index) {
                     return {
                         token: token,
                         logitStart: passage.logits_start[index],
                         logitEnd: passage.logits_end[index],
-                        color: colorScale(pIn[index])
+                        startColor: startColorScale(passage.logits_start[index]),
+                        endColor: endColorScale(passage.logits_end[index]),
+                        inColor: inColorScale(pIn[index])
                     };
                 });
             })
             .enter()
             .append('span')
             .attr('class', 'token')
-            .attr('logit-start', function(token) { return token.logitStart; })
-            .attr('logit-end', function(token) { return token.logitEnd; })
-            .attr('index', function(token, index) { return index; })
-            .style('background-color', function(token) { return token.color; })
+            .style('background-color', function(token) { return token.inColor; })
             .text(function(token) { return token.token; });
+
+        var buttons = rankContainer.append('div')
+            .attr('class', 'button-container')
+            .selectAll('button')
+            .data([
+                {name: 'Start', colorField: 'startColor'},
+                {name: 'In', colorField: 'inColor', selected: true},
+                {name: 'End', colorField: 'endColor'}
+            ])
+            .enter()
+            .append('button')
+            .text(function(button) { return button.name; })
+            .classed('selected', function(button) { return button.selected; });
+
+        buttons
+            .on('click', function(button) {
+                d3.select(this.parentNode.parentNode.parentNode)
+                    .selectAll('span.token')
+                    .style('background-color', function(token) {
+                        return token[button.colorField];
+                    });
+
+                d3.select(this.parentNode)
+                    .selectAll('button')
+                    .classed('selected', false);
+
+                d3.select(this)
+                    .classed('selected', true);
+            });
     };
 }
 

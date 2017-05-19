@@ -9,12 +9,19 @@ function createAnswerView() {
     var selection = d3.select('p#answer');
 
     return function(query, answer) {
-        var answerText = answer.passages
-            .find(function(passage) { return passage.selected; })
-            .tokens.slice(answer.start_index, answer.end_index)
-            .join(' ');
+        var passage = answer.passages
+            .find(function(passage) { return passage.selected; });
 
-        selection.text(answerText);
+        if (passage) {
+            var answerText = passage.tokens
+                .slice(passage.start_index, passage.end_index)
+                .join(' ');
+
+            selection.text(answerText);
+        } else {
+            console.error('no answer found', query, answer);
+            selection.text('');
+        }
     }
 }
 

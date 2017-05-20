@@ -72,7 +72,6 @@ input#search, button#lucky {
 }
 
 button {
-
     border: 2px solid #2c3e50;
 }
 
@@ -93,3 +92,8 @@ button:hover, button.selected {
     padding-left: 0.2em;
     line-height: 1.5em;
 }
+
+.token.in-answer {
+    font-weight: 600;
+}
+

@@ -14,7 +14,7 @@ function createAnswerView() {
 
         if (passage) {
             var answerText = passage.tokens
-                .slice(passage.start_index, passage.end_index)
+                .slice(passage.start_index, passage.end_index + 1)
                 .join(' ');
 
             selection.text(answerText);
@@ -109,7 +109,10 @@ function createPassageView() {
                         logitEnd: passage.logits_end[index],
                         startColor: startColorScale(passage.logits_start[index]),
                         endColor: endColorScale(passage.logits_end[index]),
-                        inColor: inColorScale(pIn[index])
+                        inColor: inColorScale(pIn[index]),
+                        inAnswer: (passage.selected &&
+                                   passage.start_index <= index &&
+                                   index <= passage.end_index)
                     };
                 });
             })
@@ -117,7 +120,10 @@ function createPassageView() {
             .append('span')
             .attr('class', 'token')
             .style('background-color', function(token) { return token.inColor; })
-            .text(function(token) { return token.token; });
+            .classed('in-answer', function(token) { return token.inAnswer; })
+            .text(function(token, index, tokens, a) {
+                return token.token; 
+            });
 
         var buttons = rankContainer.append('div')
             .attr('class', 'button-container')

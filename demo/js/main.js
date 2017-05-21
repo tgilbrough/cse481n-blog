@@ -14,7 +14,7 @@ function createAnswerView() {
 
         if (passage) {
             var answerText = passage.tokens
-                .slice(passage.start_index, passage.end_index)
+                .slice(passage.start_index, passage.end_index + 1)
                 .join(' ');
 
             selection.text(answerText);
@@ -35,11 +35,23 @@ function cumSum(array) {
     return sum;
 }
 
+function sample(array) {
+    return array[Math.floor(Math.random() * array.length)];
+}
+
 function createPassageView() {
     var selection = d3.select('div#passages');
 
     return function(query, answer) {
         var passages = answer.passages;
+
+        function sortKey(passage) {
+            return passage.relevance + passage.selected ? 1 : 0;
+        }
+
+        passages.sort(function(x, y) {
+            return d3.descending(sortKey(x), sortKey(y));
+        });
 
         selection.selectAll('*').remove();
 
@@ -52,12 +64,6 @@ function createPassageView() {
 
         var rankContainer = passageSelection.append('div')
             .attr('class', 'rank-container');
-
-        rankContainer.append('div')
-            .attr('class', 'rank-number')
-            .text(function(passage, index) {
-                return '#' + (index + 1);
-            });
 
         rankContainer.append('p')
             .attr('class', 'relevance')
@@ -76,37 +82,77 @@ function createPassageView() {
             .attr('href', function(passage) { return passage.url; })
             .text(function(passage) { return passage.url; });
 
-        passageContainer.append('p')
+        var tokens = passageContainer.append('p')
             .attr('class', 'passage-text')
             .selectAll('span')
             .data(function(passage) {
+                function makeScale(values) {
+                    return d3.scaleQuantize()
+                        .domain(d3.extent(values))
+                        .range(d3.schemeGreens[9].slice(0, 5));
+                }
+
                 var pStart = cumSum(passage.logits_start);
                 var pEnd = cumSum(passage.logits_end);
                 var pIn = pStart.map(function(p, i) {
                     return p * (1 - pEnd[i]);
                 });
 
-                var colorScale = d3.scaleQuantize()
-                    .domain(d3.extent(pIn))
-                    .range(d3.schemeGreens[9].slice(0, 5));
+                var startColorScale = makeScale(passage.logits_start),
+                    endColorScale = makeScale(passage.logits_end),
+                    inColorScale = makeScale(pIn);
 
                 return passage.tokens.map(function(token, index) {
                     return {
                         token: token,
                         logitStart: passage.logits_start[index],
                         logitEnd: passage.logits_end[index],
-                        color: colorScale(pIn[index])
+                        startColor: startColorScale(passage.logits_start[index]),
+                        endColor: endColorScale(passage.logits_end[index]),
+                        inColor: inColorScale(pIn[index]),
+                        inAnswer: (passage.selected &&
+                                   passage.start_index <= index &&
+                                   index <= passage.end_index)
                     };
                 });
             })
             .enter()
             .append('span')
             .attr('class', 'token')
-            .attr('logit-start', function(token) { return token.logitStart; })
-            .attr('logit-end', function(token) { return token.logitEnd; })
-            .attr('index', function(token, index) { return index; })
-            .style('background-color', function(token) { return token.color; })
-            .text(function(token) { return token.token; });
+            .style('background-color', function(token) { return token.inColor; })
+            .classed('in-answer', function(token) { return token.inAnswer; })
+            .text(function(token, index, tokens, a) {
+                return token.token; 
+            });
+
+        var buttons = rankContainer.append('div')
+            .attr('class', 'button-container')
+            .selectAll('button')
+            .data([
+                {name: 'Start', colorField: 'startColor'},
+                {name: 'In', colorField: 'inColor', selected: true},
+                {name: 'End', colorField: 'endColor'}
+            ])
+            .enter()
+            .append('button')
+            .text(function(button) { return button.name; })
+            .classed('selected', function(button) { return button.selected; });
+
+        buttons
+            .on('click', function(button) {
+                d3.select(this.parentNode.parentNode.parentNode)
+                    .selectAll('span.token')
+                    .style('background-color', function(token) {
+                        return token[button.colorField];
+                    });
+
+                d3.select(this.parentNode)
+                    .selectAll('button')
+                    .classed('selected', false);
+
+                d3.select(this)
+                    .classed('selected', true);
+            });
     };
 }
 
@@ -130,7 +176,23 @@ function autocomplete(queries) {
 
     function updateSearchBoxValue(event, ui) {
         event.preventDefault();
-        searchBox.val(ui.item.label);
+
+        if (ui.item) {
+            searchBox.val(ui.item.label);
+        }
+    }
+
+    function selectQuestion(autocompleteQuery) {
+        var query = {
+            query: autocompleteQuery.label,
+            query_id: autocompleteQuery.value - 1,
+            query_type: autocompleteQuery.type
+        };
+
+        getAnswer(query.query_id, function(answer) {
+            updatePassageView(query, answer);
+            updateAnswerView(query, answer);
+        });
     }
 
     searchBox.autocomplete({
@@ -139,23 +201,17 @@ function autocomplete(queries) {
             response($.ui.autocomplete.filter(queries, request.term).slice(0, MAX_RESULTS));
         },
         select: function(event, ui) {
-            var query = {
-                query: ui.item.label,
-                query_id: ui.item.value - 1,
-                query_type: ui.item.type
-            };
-
-            getAnswer(query.query_id, function(answer) {
-                console.log(query);
-                console.log(answer);
-                updatePassageView(query, answer);
-                updateAnswerView(query, answer);
-            });
-
+            selectQuestion(ui.item);
             updateSearchBoxValue(event, ui);
         },
         change: updateSearchBoxValue,
         focus: updateSearchBoxValue
+    });
+
+    d3.select('button#lucky').on('click', function() {
+        var query = sample(queries);
+        searchBox.val(query.label);
+        selectQuestion(query);
     });
 }
 

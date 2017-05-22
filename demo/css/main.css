@@ -21,10 +21,26 @@ input#search, button#lucky {
     padding: 0.5em;
 }
 
-#answer {
-    padding: 2em 0;
+p#question, p#answer {
+    text-align: left;
+}
+
+#answer-container {
+    padding: 2em;
+}
+
+p#question {
+    margin-bottom: 1em;
+}
+
+#question-heading, #answer-heading {
+    font-weight: bold;
+}
+
+#question, #answer {
     width: 800px;
     margin: auto;
+    font-size: 18px;
 }
 
 .passage {

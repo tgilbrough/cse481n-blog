@@ -6,9 +6,17 @@ function getAnswer(query_id, callback) {
 }
 
 function createAnswerView() {
-    var selection = d3.select('p#answer');
+    var containerSelection = d3.select('#answer-container')
+        .style('display', 'none');
+    var questionSelection = d3.select('span#question');
+    var questionTypeSelection = d3.select('span#question-type');
+    var answerSelection = d3.select('span#answer');
 
     return function(query, answer) {
+        containerSelection.style('display', 'block');
+        questionSelection.text(query.query);
+        questionTypeSelection.text(query.query_type);
+
         var passage = answer.passages
             .find(function(passage) { return passage.selected; });
 
@@ -17,10 +25,10 @@ function createAnswerView() {
                 .slice(passage.start_index, passage.end_index + 1)
                 .join(' ');
 
-            selection.text(answerText);
+            answerSelection.text(answerText);
         } else {
             console.error('no answer found', query, answer);
-            selection.text('');
+            answerSelection.text('');
         }
     }
 }

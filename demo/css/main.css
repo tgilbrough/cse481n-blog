@@ -7,6 +7,18 @@ p {
     margin: 0;
 }
 
+#title {
+    font-size: 3em;
+    margin-bottom: 0;
+}
+
+#subtitle {
+    margin-top: 0;
+    font-size: 1.2em;
+    font-weight: normal;
+    font-style: italic;
+}
+
 #content {
     text-align: center;
 }

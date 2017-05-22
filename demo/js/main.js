@@ -6,8 +6,7 @@ function getAnswer(query_id, callback) {
 }
 
 function createAnswerView() {
-    var containerSelection = d3.select('#answer-container')
-        .style('display', 'none');
+    var containerSelection = d3.select('#answer-container');
     var questionSelection = d3.select('span#question');
     var questionTypeSelection = d3.select('span#question-type');
     var answerSelection = d3.select('span#answer');
@@ -50,8 +49,7 @@ function sample(array) {
 function createPassageView() {
     var selection = d3.select('div#passages');
 
-    var buttonContainer = d3.select('#button-container')
-        .style('display', 'none')
+    var buttonContainer = d3.select('#button-container');
 
     var buttons = buttonContainer
         .selectAll('button')

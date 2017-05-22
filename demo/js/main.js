@@ -87,6 +87,7 @@ function createPassageView() {
 
         passageContainer.append('a')
             .attr('class', 'passage-link')
+            .attr('target', '_blank')
             .attr('href', function(passage) { return passage.url; })
             .text(function(passage) {
                 return (new URL(passage.url)).hostname;

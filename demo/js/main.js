@@ -90,10 +90,27 @@ function createPassageView() {
             .attr('class', 'relevance')
             .text('Relevance');
 
-        rankContainer.append('p')
-            .text(function(passage) {
-                return passage.relevance.toFixed(3);
-            });
+        var width = 100,
+            height = 20;
+
+        var relevanceScale = d3.scaleLinear()
+            .domain(d3.extent(passages.map(function(passage) {
+                return passage.relevance;
+            })))
+            .range([0, width]);
+
+        rankContainer.append('svg')
+            .attr('class', 'relevance')
+            .attr('width', width)
+            .attr('height', height)
+            .append('rect')
+            .attr('width', function(passage) {
+                return relevanceScale(passage.relevance);
+            })
+            .attr('height', height)
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('fill', d3.schemeGreens[9][5]);
 
         var passageContainer = passageSelection.append('div')
             .attr('class', 'passage-container');

@@ -50,6 +50,21 @@ function sample(array) {
 function createPassageView() {
     var selection = d3.select('div#passages');
 
+    var buttonContainer = d3.select('#button-container')
+        .style('display', 'none')
+
+    var buttons = buttonContainer
+        .selectAll('button')
+        .data([
+            {name: 'Start', colorField: 'startColor'},
+            {name: 'In', colorField: 'inColor', selected: true},
+            {name: 'End', colorField: 'endColor'}
+        ])
+        .enter()
+        .append('button')
+        .text(function(button) { return button.name; })
+        .classed('selected', function(button) { return button.selected; });
+
     return function(query, answer) {
         var passages = answer.passages;
 
@@ -133,26 +148,15 @@ function createPassageView() {
             .style('background-color', function(token) { return token.inColor; })
             .classed('in-answer', function(token) { return token.inAnswer; })
             .text(function(token, index, tokens, a) {
-                return token.token; 
+                return token.token;
             });
 
-        var buttons = rankContainer.append('div')
-            .attr('class', 'button-container')
-            .selectAll('button')
-            .data([
-                {name: 'Start', colorField: 'startColor'},
-                {name: 'In', colorField: 'inColor', selected: true},
-                {name: 'End', colorField: 'endColor'}
-            ])
-            .enter()
-            .append('button')
-            .text(function(button) { return button.name; })
-            .classed('selected', function(button) { return button.selected; });
+        buttonContainer.style('display', 'block');
 
         buttons
+            .classed('selected', function(button) { return button.selected; })
             .on('click', function(button) {
-                d3.select(this.parentNode.parentNode.parentNode)
-                    .selectAll('span.token')
+                tokens
                     .style('background-color', function(token) {
                         return token[button.colorField];
                     });

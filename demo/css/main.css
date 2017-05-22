@@ -21,12 +21,12 @@ input#search, button#lucky {
     padding: 0.5em;
 }
 
-p#question, p#answer {
-    text-align: left;
-}
-
 #answer-container {
-    padding: 2em;
+    padding: 1em;
+    width: 800px;
+    margin: auto;
+    font-size: 18px;
+    text-align: left;
 }
 
 p#question {
@@ -35,12 +35,6 @@ p#question {
 
 #question-heading, #answer-heading {
     font-weight: bold;
-}
-
-#question, #answer {
-    width: 800px;
-    margin: auto;
-    font-size: 18px;
 }
 
 .passage {
@@ -77,11 +71,12 @@ p#question {
     text-align: center;
 }
 
-.button-container {
-    margin-top: 0.5em;
+#button-container {
+    text-align: center;
+    margin-bottom: 1em;
 }
 
-.button-container > button {
+#button-container > button {
     font-size: 0.8em;
     padding: 0.3em 0.4em;
     margin: 0.2em;

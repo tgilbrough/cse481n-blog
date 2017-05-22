@@ -2,7 +2,7 @@
 
 
 function getAnswer(query_id, callback) {
-    d3.json('data/answers/' + query_id + '.json', callback);
+    d3.json('data/answers/attention/' + query_id + '.json', callback);
 }
 
 function createAnswerView() {
@@ -95,7 +95,7 @@ function createPassageView() {
                 var pStart = cumSum(passage.logits_start);
                 var pEnd = cumSum(passage.logits_end);
                 var pIn = pStart.map(function(p, i) {
-                    return p * (1 - pEnd[i]);
+                    return p * (1 - pEnd[i - 1 >= 0 ? i - 1 : 0]);
                 });
 
                 var startColorScale = makeScale(passage.logits_start),
@@ -219,7 +219,7 @@ function autocomplete(queries) {
     d3.json('data/queries.json', function(queries) {
         // Currently limited to location questions.
         queries = queries.filter(function(query) {
-            return query.query_type == 'location';
+            return query.query_type == 'person';
         });
 
         autocomplete(queries);

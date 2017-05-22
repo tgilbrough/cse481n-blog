@@ -80,7 +80,9 @@ function createPassageView() {
         passageContainer.append('a')
             .attr('class', 'passage-link')
             .attr('href', function(passage) { return passage.url; })
-            .text(function(passage) { return passage.url; });
+            .text(function(passage) {
+                return (new URL(passage.url)).hostname;
+            });
 
         var tokens = passageContainer.append('p')
             .attr('class', 'passage-text')
@@ -219,7 +221,7 @@ function autocomplete(queries) {
     d3.json('data/queries.json', function(queries) {
         // Currently limited to location questions.
         queries = queries.filter(function(query) {
-            return query.query_type == 'person';
+            return query.query_type != 'description';
         });
 
         autocomplete(queries);

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>MrKnowItAll</title>
+    <meta charset="utf-8">
+    <meta name="description" content="CSE 481N: MrKnowItAll">
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-request.v1.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-dsv.v1.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="css/main.css" />
+</head>
+
+
+<body>
+    <div id="content">
+        <h1 id="title">MrKnowItAll</h1>
+        <h2 id="subtitle">The Search Engine of the Future™</h2>
+        <input id="search">
+        <button type="button" id="lucky">I'm Feeling Lucky</button>
+        <div id="answer-container" style="display: none">
+            <p id="question">
+                <span id="question-heading">Question (<span id="question-type"></span>): </span>
+                <span id="question">
+            </p>
+
+            <p id="answer">
+                <span id="answer-heading">Answer: </span>
+                <span id="answer">
+            </p>
+        </div>
+        <div id="button-container" style="display: none"></div>
+        <div id="passages"></div>
+    </div>
+
+    <script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>

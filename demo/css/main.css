@@ -34,7 +34,6 @@ input#search, button#lucky {
 }
 
 #answer-container {
-    padding: 1em;
     width: 800px;
     margin: auto;
     font-size: 18px;
@@ -83,13 +82,13 @@ p#question {
     text-align: center;
 }
 
-#button-container {
+.button-container {
     text-align: center;
-    margin-bottom: 1em;
+    margin: 1.25em;
 }
 
-#button-container > button {
-    font-size: 0.8em;
+.button-container > button {
+    font-size: 0.9em;
     padding: 0.3em 0.4em;
     margin: 0.2em;
 }

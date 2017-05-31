@@ -1,8 +1,14 @@
 'use strict';
 
+var models = [
+    {name: 'Baseline', model: 'baseline', selected: true},
+    {name: 'Attention', model: 'attention'}
+];
+
+var currentModel = models[0];
 
 function getAnswer(query_id, callback) {
-    d3.json('data/answers/attention/' + query_id + '.json', callback);
+    d3.json('data/answers/' + currentModel.model + '/' + query_id + '.json', callback);
 }
 
 function createAnswerView() {
@@ -49,21 +55,26 @@ function sample(array) {
 function createPassageView() {
     var selection = d3.select('div#passages');
 
-    var buttonContainer = d3.select('#button-container');
+    var buttonContainer = d3.select('#prob-button-container');
+
+    var buttonData = [
+        {name: 'Start', colorField: 'startColor'},
+        {name: 'In', colorField: 'inColor', selected: true},
+        {name: 'End', colorField: 'endColor'}
+    ];
+
+    var currentButton = buttonData[1];
 
     var buttons = buttonContainer
         .selectAll('button')
-        .data([
-            {name: 'Start', colorField: 'startColor'},
-            {name: 'In', colorField: 'inColor', selected: true},
-            {name: 'End', colorField: 'endColor'}
-        ])
+        .data(buttonData)
         .enter()
         .append('button')
         .text(function(button) { return button.name; })
         .classed('selected', function(button) { return button.selected; });
 
     return function(query, answer) {
+        d3.select('#model-button-container').style('display', 'block');
         var passages = answer.passages;
 
         function sortKey(passage) {
@@ -160,7 +171,7 @@ function createPassageView() {
             .enter()
             .append('span')
             .attr('class', 'token')
-            .style('background-color', function(token) { return token.inColor; })
+            .style('background-color', function(token) { return token[currentButton.colorField]; })
             .classed('in-answer', function(token) { return token.inAnswer; })
             .text(function(token, index, tokens, a) {
                 return token.token;
@@ -169,8 +180,9 @@ function createPassageView() {
         buttonContainer.style('display', 'block');
 
         buttons
-            .classed('selected', function(button) { return button.selected; })
             .on('click', function(button) {
+                currentButton = button;
+
                 tokens
                     .style('background-color', function(token) {
                         return token[button.colorField];
@@ -183,6 +195,7 @@ function createPassageView() {
                 d3.select(this)
                     .classed('selected', true);
             });
+
     };
 }
 
@@ -212,17 +225,23 @@ function autocomplete(queries) {
         }
     }
 
+    var currentQuestion;
+
+    function update() {
+        getAnswer(currentQuestion.query_id, function(answer) {
+            updatePassageView(currentQuestion, answer);
+            updateAnswerView(currentQuestion, answer);
+        });
+    }
+
     function selectQuestion(autocompleteQuery) {
-        var query = {
+        currentQuestion = {
             query: autocompleteQuery.label,
             query_id: autocompleteQuery.value - 1,
             query_type: autocompleteQuery.type
         };
 
-        getAnswer(query.query_id, function(answer) {
-            updatePassageView(query, answer);
-            updateAnswerView(query, answer);
-        });
+        update();
     }
 
     searchBox.autocomplete({
@@ -243,13 +262,36 @@ function autocomplete(queries) {
         searchBox.val(query.label);
         selectQuestion(query);
     });
+
+    var modelButtonContainer = d3.select('#model-button-container');
+
+    var modelButtons = modelButtonContainer
+        .selectAll('button')
+        .data(models)
+        .enter()
+        .append('button')
+        .text(function(button) { return button.name; })
+        .classed('selected', function(button) { return button.selected; })
+        .on('click', function(model) {
+            if (model.model != currentModel.model) {
+                currentModel = model;
+                update();
+
+                d3.select(this.parentNode)
+                    .selectAll('button')
+                    .classed('selected', false);
+
+                d3.select(this)
+                    .classed('selected', true);
+            }
+        });
 }
 
 (function() {
     d3.json('data/queries.json', function(queries) {
         // Currently limited to location questions.
         queries = queries.filter(function(query) {
-            return query.query_type != 'description';
+            return query.query_type == 'location';
         });
 
         autocomplete(queries);

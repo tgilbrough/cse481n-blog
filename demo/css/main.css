@@ -91,6 +91,9 @@ p#question {
     font-size: 0.9em;
     padding: 0.3em 0.4em;
     margin: 0.2em;
+    width: 10%;
+    min-width: 100px;
+    border-radius: 3px;
 }
 
 button {

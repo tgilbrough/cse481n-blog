@@ -2,7 +2,8 @@
 
 var models = [
     {name: 'Baseline', model: 'baseline', selected: true},
-    {name: 'Attention', model: 'attention'}
+    {name: 'Attention', model: 'attention'},
+    {name: 'Coattention', model: 'coattention'}
 ];
 
 var currentModel = models[0];

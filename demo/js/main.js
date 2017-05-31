@@ -291,7 +291,7 @@ function autocomplete(queries) {
     d3.json('data/queries.json', function(queries) {
         // Currently limited to location questions.
         queries = queries.filter(function(query) {
-            return query.query_type == 'location';
+            return query.query_type != 'description';
         });
 
         autocomplete(queries);

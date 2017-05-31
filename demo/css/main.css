@@ -84,13 +84,16 @@ p#question {
 
 .button-container {
     text-align: center;
-    margin: 1.25em;
+    margin: 1em;
 }
 
 .button-container > button {
     font-size: 0.9em;
     padding: 0.3em 0.4em;
     margin: 0.2em;
+    width: 10%;
+    min-width: 100px;
+    border-radius: 3px;
 }
 
 button {
